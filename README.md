@@ -1,6 +1,6 @@
 # nuunamnir.fractal-shaders
 ## Description
-rm Heavily inspired by code examples of the [ModernGL](https://github.com/moderngl/moderngl) project.
+OpenGL shader based visualization of popular fractals. Heavily inspired by code examples of the [ModernGL](https://github.com/moderngl/moderngl) project.
 ## Installation and Requirements
 Make sure to have a Python interpreter installed. Then, just clone this repository and get the dependencies via pip.
 ```
