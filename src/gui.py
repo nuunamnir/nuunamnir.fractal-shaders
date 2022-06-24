@@ -20,8 +20,8 @@ class GUI(moderngl_window.WindowConfig):
     @classmethod
     def add_arguments(cls, parser):
         parser.add_argument('output', type=str, help='the destination to which the visualizations are saved, must contain {0}')
-        parser.add_argument('-f', '--fractal', type=str, default='mandelbrot', help='the fractal to be visualized', choices=['mandelbrot', 'julia'])
-        parser.add_argument('-m', '--map', type=str, default='mandelbrot_00', help='the color mapping used to visualize the fractal', choices=['mandelbrot_00', 'julia_00', 'julia_01'])
+        parser.add_argument('-f', '--fractal', type=str, default='mandelbrot', help='the fractal to be visualized', choices=['mandelbrot', 'julia', 'newton'])
+        parser.add_argument('-m', '--map', type=str, default='mandelbrot_00', help='the color mapping used to visualize the fractal', choices=['mandelbrot_00', 'julia_00', 'julia_01', 'newton_00'])
    
 
     @classmethod

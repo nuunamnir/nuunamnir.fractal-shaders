@@ -8,7 +8,7 @@ cd nuunamnir.georg-nees
 pip install -r requirements.txt
 ```
 ## Usage
-Run the Python script of the respective fractal; currently implemented is the Mandelbrot and the Julia fractal.
+Run the Python script of the respective fractal; currently implemented is the Mandelbrot, the Julia, and the Newton fractal.
 You can zoom into the fractal using the mouse wheel.
 You can pan using left mouse button drag.
 You can increase and decrease fractal detail (iterations) using left or right mouse button click respectively.
@@ -32,3 +32,10 @@ python generate.py -f julia -m julia_00 "../examples/julia_{0}.png"
 ![Julia fractal example](examples/julia_00.png)
 ![Julia fractal example](examples/julia_01.png)
 ![Julia fractal example](examples/julia_02.png)
+### Newton Fractal
+```
+python generate.py -f newton -m newton_00 "../examples/newton_{0}.png"
+```
+![Newton fractal example](examples/newton_00.png)
+![Newton fractal example](examples/newton_01.png)
+![Newton fractal example](examples/newton_02.png)

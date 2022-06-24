@@ -7,12 +7,12 @@ import PIL.Image
 import gui
 
 
-class Julia(gui.GUI):
-    title = 'Fractal Shader: Julia'
+class Newton(gui.GUI):
+    title = 'Fractal Shader: Newton'
 
 
     def _scale_function(self, x):
-        return (1 / (x ** 2 + 1))
+        return 2 ** x
 
 
     def __init__(self, **kwargs):
@@ -33,44 +33,71 @@ class Julia(gui.GUI):
             fragment_shader = '''
                 #version 460
 
+                // implementation following the pseudo-code from https://en.wikipedia.org/wiki/Newton_fractal
                 in vec2 v_text;
                 out vec4 f_color;
                 uniform sampler2D Texture;
-                uniform vec2 Center;
-                uniform float Scale;
                 uniform float Ratio;
+                uniform float Scale;
+                uniform vec2 Center;
                 uniform int Iter;
+
+                vec2 ComplexProduct(vec2 a, vec2 b) {
+                    return vec2(a.x*b.x - a.y*b.y, a.x*b.y + a.y*b.x);
+                }
+
+                vec2 ComplexQuotient(vec2 a, vec2 b) {
+                    return vec2(((a.x*b.x+a.y*b.y)/(b.x*b.x+b.y*b.y)),((a.y*b.x-a.x*b.y)/(b.x*b.x+b.y*b.y)));
+                } 
+
+                vec2 f(vec2 x) {
+                    return ComplexProduct(ComplexProduct(x, x), x) - vec2(1, 0);
+                }
+                
+                vec2 fPrime(vec2 x) {
+                    return 3 * ComplexProduct(x, x);
+                }
+
                 void main() {
-                    vec2 c = Center;
+                    vec2 z = vec2((((v_text.x * Scale * Ratio + 1) / 2.) * 3.5) - 2.5 + Center.x, (((v_text.y * Scale + 1) / 2.) * 3) - 2. + Center.y);
+                    f_color = vec4(z.x, z.y, 0., 0.);
+
                     int i;
-                    vec2 z = vec2(2 * v_text.x * Ratio, 4/3 * v_text.y);
+                    int root = 0;
+                    float threshold = 0.000001;
                     for (i = 0; i < Iter; i++) {
-                        float x = (z.x * z.x - z.y * z.y)  + c.x * Scale;
-                        float y = (z.y * z.x + z.x * z.y)  + c.y * Scale;
-                        if ((x * x + y * y) > 4.0) {
+                        z = z - ComplexQuotient(f(z), fPrime(z));
+                        if(abs(z.x - 1) < threshold && abs(z.y - 0) < threshold) {
+                            root = 0;
                             break;
                         }
-                        z.x = x;
-                        z.y = y;
+                        if(abs(z.x + 0.5) < threshold && abs(z.y - sqrt(3) / 2.) < threshold) {
+                            root = 1;
+                            break;
+                        }
+                        if(abs(z.x + 0.5) < threshold && abs(z.y + sqrt(3) / 2.) < threshold) {
+                            root = 2;
+                            break;
+                        }
                     }
-                    f_color = texture(Texture, vec2((i == Iter ? 0.0 : float(i)) / float(Iter), 0.0));
+                    f_color =  texture(Texture, vec2((1./3.) * root + float(i) / float(Iter) / 3., 0.0));
                 }
             ''',
         )
 
-        self.center = self.prog['Center']
-        self.center.value = (-0.8, 0.156)
-        self.scale = self.prog['Scale']
-        self.scale_minimum = 0.0125
-        self.scale_counter = self.scale_minimum
+        self.texture = self.load_texture_2d(f'{self.colormap}.png')
 
-        self.scale.value = self._scale_function(self.scale_counter)
+        self.center = self.prog['Center']
+        self.center.value = (0, 0)
+
         self.ratio = self.prog['Ratio']        
         self.ratio.value = self.aspect_ratio
-        self.iter = self.prog['Iter']
-        self.iter.value = 127
 
-        self.texture = self.load_texture_2d(f'{self.colormap}.png')
+        self.scale = self.prog['Scale']
+        self.scale.value = 1.
+
+        self.iter = self.prog['Iter']
+        self.iter.value = 7
 
         vertices = numpy.array([-1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0])
         self.vbo = self.ctx.buffer(vertices.astype('f4'))
@@ -94,24 +121,18 @@ class Julia(gui.GUI):
                 self.image_counter += 1
                 print(f'image written to {output_file_path} ...')
 
+    def mouse_drag_event(self, x, y, dx, dy):
+        self.center.value =  (self.center.value[0] + (-dx / self.window_size[0]) * self.scale.value, self.center.value[1] + (dy / self.window_size[1]) * self.scale.value)
+
 
     def mouse_scroll_event(self, x_offset: float, y_offset: float):
-        self.scale_counter = self.scale_counter + (y_offset / 4)
-        if self.scale_counter < self.scale_minimum:
-            self.scale_counter = self.scale_minimum
-        self.scale.value = self._scale_function(self.scale_counter)
-
+        self.scale.value += 0.01 * y_offset
 
     def mouse_press_event(self, x, y, button):
         if button == 1:
             self.iter.value += 1
         else:
             self.iter.value -= 1
-
-
-    def mouse_drag_event(self, x, y, dx, dy):
-        self.center.value =  (self.center.value[0] + (dx / self.window_size[0]) * self.scale.value , self.center.value[1] + (-dy / self.window_size[1]) * self.scale.value)
-
 
     def render(self, time, frame_time):
         self.ctx.clear(1., 1., 1.)
@@ -120,4 +141,4 @@ class Julia(gui.GUI):
 
 
 if __name__ == '__main__':
-    Julia.run(output_pattern=os.path.join('..', 'data', 'output', 'julia_{0}.png'), colormap='newton_00')
+    Newton.run(output_pattern=os.path.join('..', 'data', 'output', 'newton_{0}.png'))

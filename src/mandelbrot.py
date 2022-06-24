@@ -53,7 +53,7 @@ class Mandelbrot(gui.GUI):
                         z.x = x;
                         z.y = y;
                     }
-                    f_color = texture(Texture, vec2((i == Iter ? 0.0 : float(i)) / 100.0, 0.0));
+                    f_color = texture(Texture, vec2((i == Iter ? 0.0 : float(i)) / float(Iter), 0.0));
                 }
             ''',
         )
@@ -66,9 +66,9 @@ class Mandelbrot(gui.GUI):
         self.ratio = self.prog['Ratio']        
         self.ratio.value = self.aspect_ratio
         self.iter = self.prog['Iter']
-        self.iter.value = 100
+        self.iter.value = 127
 
-        self.texture = self.load_texture_2d('mandelbrot_00.png')
+        self.texture = self.load_texture_2d(f'{self.colormap}.png')
 
         vertices = numpy.array([-1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0])
         self.vbo = self.ctx.buffer(vertices.astype('f4'))
