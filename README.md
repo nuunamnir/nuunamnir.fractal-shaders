@@ -4,7 +4,7 @@ OpenGL shader based visualization of popular fractals. Heavily inspired by code 
 ## Installation and Requirements
 Make sure to have a Python interpreter installed. Then, just clone this repository and get the dependencies via pip.
 ```
-cd nuunamnir.georg-nees
+cd nuunamnir.fractal-shaders
 pip install -r requirements.txt
 ```
 ## Usage
